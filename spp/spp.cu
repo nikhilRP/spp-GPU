@@ -15,7 +15,8 @@
 #include <nvbio/basic/console.h>
 #include <nvbio/basic/shared_pointer.h>
 #include <nvbio/io/fmindex/fmindex.h>
-#include <spp/alignment.h>
+
+#include "alignment.h"
 
 void crcInit();
 
@@ -130,7 +131,7 @@ int main(int argc, char* argv[])
         log_error(stderr, "caught a std::bad_alloc exception:\n");
         log_error(stderr, "  %s\n", e.what());
     }
-    catch (std::logic_error e)
+    catch (std::logic_error &e)
     {
         log_error(stderr, "caught a std::logic_error exception:\n");
         log_error(stderr, "  %s\n", e.what());

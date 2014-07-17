@@ -1,7 +1,8 @@
-#include <spp/alignment.h>
 #include <contrib/bamtools/BamReader.h>
 #include <nvbio/basic/console.h>
 #include <crc/crc.h>
+
+#include "alignment.h"
 
 namespace nvbio {
 namespace spp {

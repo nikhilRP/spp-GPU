@@ -1,11 +1,11 @@
-#include <spp/alignment.h>
 #include <zlib/zlib.h>
 #include <string.h>
+
+#include "alignment.h"
 
 namespace nvbio {
 namespace spp {
 
-AlignmentStream* open_dbg_file(const char* file_name);
 AlignmentStream* open_bam_file(const char* file_name);
 
 AlignmentStream* open_alignment_file(const char* file_name)
