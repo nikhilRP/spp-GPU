@@ -1,4 +1,4 @@
-spp-GPU
+spp-GPU - Still in the development, not ready to use
 =======
 
-GPU version of SPP peak caller
+
