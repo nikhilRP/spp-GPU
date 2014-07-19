@@ -3,7 +3,7 @@
 #include <nvbio/basic/threads.h>
 #include <nvbio/basic/timer.h>
 
-#include <spp/cuda/input_thread.h>
+#include "input_thread.h"
 
 namespace nvbio {
 namespace spp {
