@@ -1,11 +1,9 @@
 nvbio_module(idr)
 
 addsources(
-    spp.cu
-    alignment.h
-    alignment.cpp
-    alignment_bam.cpp
+    spp.cpp
 )
+nvbio_add_module_directory(cuda)
 
 cuda_add_executable(spp ${idr_srcs})
-target_link_libraries(spp bamtools nvbio zlibstatic crcstatic ${SYSTEM_LINK_LIBRARIES})
+target_link_libraries(spp nvbio zlibstatic crcstatic ${SYSTEM_LINK_LIBRARIES})

@@ -79,6 +79,8 @@ add_subdirectory(${NVBIO_SOURCE_ROOT}/contrib/bamtools)
 add_subdirectory(${NVBIO_SOURCE_ROOT}/contrib/moderngpu)
 
 add_subdirectory(${NVBIO_SOURCE_ROOT}/nvbio)
+add_subdirectory(${NVBIO_SOURCE_ROOT}/nvBWT)
+add_subdirectory(${NVBIO_SOURCE_ROOT}/nvBowtie)
 add_subdirectory(spp)
 
 nvbio_module(nvbio-project)

@@ -13,21 +13,27 @@
 
 #include <nvbio/basic/timer.h>
 #include <nvbio/basic/console.h>
+#include <nvbio/io/sequence/sequence.h>
 #include <nvbio/basic/shared_pointer.h>
 #include <nvbio/io/fmindex/fmindex.h>
 
-#include "alignment.h"
+#include "cuda/spp_cuda_driver.h"
 
 void crcInit();
 
+namespace nvbio {
+namespace spp {
+namespace cuda {
+
+
+} // namespace cuda
+} // namespace spp
+} // namespace nvbio
+
 using namespace nvbio;
-using namespace spp;
 
 int main(int argc, char* argv[])
 {
-    Timer timer;
-    timer.start();
-
     cudaSetDeviceFlags( cudaDeviceMapHost | cudaDeviceLmemResizeToMax );
 
     crcInit();
@@ -76,57 +82,66 @@ int main(int argc, char* argv[])
         cudaSetDevice( cuda_device );
     }
 
+    io::QualityEncoding qencoding = io::Phred33;
     int arg = 1;
     try
     {
-        if (argc == arg + 2)
-        {
-            const char *aln_file_nameL = argv[arg];
-            const char *aln_file_nameR = argv[arg+1];
+    	const char *chip_file_name = argv[arg];
+    	const char *input_file_name = argv[arg+1];
 
-            SharedPointer<AlignmentStream> aln_streamL = SharedPointer<AlignmentStream>( open_alignment_file( aln_file_nameL ) );
-            SharedPointer<AlignmentStream> aln_streamR = SharedPointer<AlignmentStream>( open_alignment_file( aln_file_nameR ) );
+    	log_visible(stderr, "opening read file [1] \"%s\"\n", chip_file_name);
+		SharedPointer<nvbio::io::SequenceDataStream> chip_data_file(
+			nvbio::io::open_sequence_file(chip_file_name,
+									  qencoding,
+									  uint32(-1),
+									  uint32(-1),
+									  io::REVERSE)
+		);
 
-            printf("I'm here");
+		if (chip_data_file == NULL || chip_data_file->is_ok() == false)
+		{
+			log_error(stderr, "unable to open read file \"%s\"\n", chip_file_name);
+			return 1;
+		}
 
-            if (aln_streamL == NULL || aln_streamL->is_ok() == false)
-            {
-                log_error(stderr, "failed opening \"%s\"\n", aln_file_nameL);
-                exit(1);
-            }
+		log_visible(stderr, "opening read file [2] \"%s\"\n", input_file_name);
+		SharedPointer<nvbio::io::SequenceDataStream> input_data_file(
+			nvbio::io::open_sequence_file(input_file_name,
+									  qencoding,
+									  uint32(-1),
+									  uint32(-1),
+									  io::REVERSE)
+		);
 
-            if (aln_streamR == NULL || aln_streamR->is_ok() == false)
-            {
-                log_error(stderr, "failed opening \"%s\"\n", aln_file_nameR);
-                exit(1);
-            }
+		if (input_data_file == NULL || input_data_file->is_ok() == false)
+		{
+			log_error(stderr, "unable to open read file \"%s\"\n", input_file_name);
+			return 1;
+		}
 
-            const uint32 BATCH_SIZE = 500000;
-            std::vector<Alignment> batchL( BATCH_SIZE );
-            std::vector<Alignment> batchR( BATCH_SIZE );
-        }
+		nvbio::spp::cuda::driver( *chip_data_file, *input_data_file );
     }
-    catch (nvbio::cuda_error e)
+    catch (nvbio::cuda_error &e)
     {
         log_error(stderr, "caught a nvbio::cuda_error exception:\n");
         log_error(stderr, "  %s\n", e.what());
     }
-    catch (nvbio::bad_alloc e)
+    catch (nvbio::bad_alloc &e)
     {
         log_error(stderr, "caught a nvbio::bad_alloc exception:\n");
         log_error(stderr, "  %s\n", e.what());
     }
-    catch (nvbio::logic_error e)
+    catch (nvbio::logic_error &e)
     {
         log_error(stderr, "caught a nvbio::logic_error exception:\n");
         log_error(stderr, "  %s\n", e.what());
     }
-    catch (nvbio::runtime_error e)
+    catch (nvbio::runtime_error &e)
     {
         log_error(stderr, "caught a nvbio::runtime_error exception:\n");
         log_error(stderr, "  %s\n", e.what());
     }
-    catch (std::bad_alloc e)
+    catch (std::bad_alloc &e)
     {
         log_error(stderr, "caught a std::bad_alloc exception:\n");
         log_error(stderr, "  %s\n", e.what());
@@ -136,7 +151,7 @@ int main(int argc, char* argv[])
         log_error(stderr, "caught a std::logic_error exception:\n");
         log_error(stderr, "  %s\n", e.what());
     }
-    catch (std::runtime_error e)
+    catch (std::runtime_error &e)
     {
         log_error(stderr, "caught a std::runtime_error exception:\n");
         log_error(stderr, "  %s\n", e.what());
